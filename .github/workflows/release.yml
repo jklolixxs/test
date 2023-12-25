@@ -35,7 +35,7 @@ jobs:
 
       - name: Set up GoReleaser
         if: ${{ env.VERSION != '' }}
-        uses: actions/setup-go@v5.0.0
+        uses: actions/setup-go@v5
         with:
           go-version: "stable"
 
@@ -55,4 +55,8 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
-          files: ${{ env.workdir }}/dist/*.tar.gz
+          prerelease: false
+          files: |
+            ${{ env.workdir }}/dist/sing-box_darwin_*.tar.gz
+            ${{ env.workdir }}/dist/sing-box_linux_*.tar.gz
+            ${{ env.workdir }}/dist/sing-box_linux_*.zip
