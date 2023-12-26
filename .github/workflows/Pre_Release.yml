@@ -23,13 +23,14 @@ jobs:
 
       - name: Git clone sing-box
         run: |
-          [ -e README.md ] && NOW=$(awk '/^ - ### \*\*latest\*\*:/{print $NF}' README.md)
-          LATEST=$(wget -qO- "https://api.github.com/repos/SagerNet/sing-box/releases" | awk -F '"' '/tag_name/{print $4}')
-          if [ "$NOW" != "$LATEST" ]; then
-            sed -i '/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$LATEST/' README.md
-            echo "VERSION=$LATEST" >> $GITHUB_ENV
+          apt-get install -y jq
+          [ -e README.md ] && OLD=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
+          NEW=$(echo $dev_next_tag_data | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
+          if [ "$OLD" != "$NEW" ]; then
+            sed -i '/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$NEW/' README.md
+            echo "VERSION=$NEW" >> $GITHUB_ENV
           fi
-          git clone -b "$LATEST" https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
+          git clone -b "$NEW" https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
           cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
           sed -i 's/ChangeSingBoxVersion/$LATEST/g' ${{ env.workdir }}/.goreleaser.yml
 
