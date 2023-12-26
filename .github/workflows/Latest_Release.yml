@@ -26,12 +26,12 @@ jobs:
           [ -e README.md ] && OLD=$(awk '/^ - ### \*\*latest\*\*:/{print $NF}' README.md)
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
           sed -i '/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$NEW/' README.md
+          git clone -b '$NEW' https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
+          cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
+          sed -i 's/ChangeSingBoxVersion/$NEW/g' ${{ env.workdir }}/.goreleaser.yml
           if [ "$OLD" != "$NEW" ]; then
             echo "VERSION=$NEW" >> $GITHUB_ENV
           fi
-          git clone -b "$NEW" https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
-          cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
-          sed -i 's/ChangeSingBoxVersion/$NEW/g' ${{ env.workdir }}/.goreleaser.yml
 
       - name: Set up GoReleaser
         if: ${{ env.VERSION != '' }}
