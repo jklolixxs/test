@@ -58,7 +58,7 @@ snapshot:
   name_template: "sing-box"
 
 archives:
-  - name_template: "sing-box_{{ .Os }}_{{ .Arch }}"
+  - name_template: "sing-box_ChangeSingBoxVersion_{{ .Os }}_{{ .Arch }}"
     files:
       - none*
 
