@@ -31,7 +31,7 @@ jobs:
           fi
           git clone -b $LATEST https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
           cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
-          sed -i 's/ChangeSingBoxVersion/$LATEST/g' ${{ env.workdir }}/.goreleaser.yml
+          sed -i 's|ChangeSingBoxVersion|$LATEST|g' ${{ env.workdir }}/.goreleaser.yml
 
       - name: Set up GoReleaser
         if: ${{ env.VERSION != '' }}
