@@ -55,5 +55,5 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
-          prerelease: false
+          prerelease: true
           files: ${{ env.workdir }}/dist/*.tar.gz
