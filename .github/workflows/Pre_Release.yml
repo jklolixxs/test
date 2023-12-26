@@ -9,7 +9,7 @@ on:
       - completed
 
 jobs:
-  Sing-box:
+  Building:
     name: Build Release
     runs-on: ubuntu-latest
     env:
@@ -23,15 +23,15 @@ jobs:
 
       - name: Git clone sing-box
         run: |
-          [ -e README.md ] && NOW=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
+          [ -e README.md ] && NOW=$(awk '/^ - ### \*\*latest\*\*:/{print $NF}' README.md)
           LATEST=$(wget -qO- "https://api.github.com/repos/SagerNet/sing-box/releases" | awk -F '"' '/tag_name/{print $4}')
           if [ "$NOW" != "$LATEST" ]; then
-            sed -i '\|^ - ### \*\*dev-next\*\*:|s|\(.*: \).*|\1$LATEST|' README.md
+            sed -i '/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$LATEST/' README.md
             echo "VERSION=$LATEST" >> $GITHUB_ENV
           fi
           git clone -b $LATEST https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
           cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
-          sed -i 's|ChangeSingBoxVersion|$LATEST|g' ${{ env.workdir }}/.goreleaser.yml
+          sed -i 's/ChangeSingBoxVersion/$LATEST/g' ${{ env.workdir }}/.goreleaser.yml
 
       - name: Set up GoReleaser
         if: ${{ env.VERSION != '' }}
@@ -55,5 +55,5 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
-          prerelease: true
+          prerelease: false
           files: ${{ env.workdir }}/dist/*.tar.gz
