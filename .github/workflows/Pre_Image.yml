@@ -30,7 +30,6 @@ jobs:
           echo " NOW: $NOW"
           echo " LATEST: $LATEST"
           if [ "$NOW" != "$LATEST" ]; then
-            sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$LATEST/" README.md
             echo "VERSION=$LATEST" >> $GITHUB_ENV
           fi
 
