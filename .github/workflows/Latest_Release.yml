@@ -1,12 +1,17 @@
-name: "4. Build & Pull latest release"
+name: "3. Build Latest Release & Pull"
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["2. Build dev-next Images"]
+    branches: [main]
+    types:
+      - completed
 
 jobs:
-  Sing-box:
-    name: Cross compile Sing-box
-    runs-on: ubuntu-20.04
+  Building:
+    name: Build Release
+    runs-on: ubuntu-latest
     env:
       workdir: sing-box-source
 
