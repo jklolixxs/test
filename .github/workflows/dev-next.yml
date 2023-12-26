@@ -3,7 +3,7 @@ name: "2. Build dev-next Images && Pull Release"
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["1. Build Latest Images"]
+    workflows: ["1. Build Latest Images && Pull Release"]
     branches: [main]
     types:
       - completed
