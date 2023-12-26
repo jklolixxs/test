@@ -70,11 +70,13 @@ jobs:
       # -
 
       - name: Checkout code
+        if: ${{ env.VERSION != '' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Git clone sing-box
+        if: ${{ env.VERSION != '' }}
         run: |
           git clone -b "${{ env.VERSION }}" https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
           cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
