@@ -24,7 +24,7 @@ jobs:
       - name: Git clone sing-box
         run: |
           [ -e README.md ] && OLD=$(awk '/^ - ### \*\*latest\*\*:/{print $NF}' README.md)
-          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
+          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
           if [ "$OLD" != "$NEW" ]; then
             sed -i '/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$NEW/' README.md
             echo "VERSION=$NEW" >> $GITHUB_ENV
