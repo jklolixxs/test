@@ -1,4 +1,4 @@
-name: "2. Build dev-next Images"
+name: "2. Build dev-next Images && Pull Release"
 
 on:
   workflow_dispatch:
@@ -30,6 +30,7 @@ jobs:
           echo " NOW: $NOW"
           echo " LATEST: $LATEST"
           if [ "$NOW" != "$LATEST" ]; then
+            sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$LATEST/" README.md
             echo "VERSION=$LATEST" >> $GITHUB_ENV
           fi
 
@@ -64,3 +65,41 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Build ${{ env.VERSION }} by Github Actions, ${{ env.DATE }}
+
+      # -
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Git clone sing-box
+        run: |
+          git clone -b "${{ env.VERSION }}" https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
+          cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
+          sed -i 's/ChangeSingBoxVersion/${{ env.VERSION }}/g' ${{ env.workdir }}/.goreleaser.yml
+
+      - name: Set up GoReleaser
+        if: ${{ env.VERSION != '' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Run GoReleaser
+        if: ${{ env.VERSION != '' }}
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          workdir: ${{ env.workdir }}
+          args: --auto-snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release binaries
+        if: ${{ env.VERSION != '' }}
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          tag_name: ${{ env.VERSION }}
+          prerelease: true
+          files: ${{ env.workdir }}/dist/*.tar.gz
