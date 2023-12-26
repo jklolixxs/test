@@ -1,0 +1,58 @@
+name: "5. Build & Pull prerelease release"
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["4. Build & Pull prerelease release"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  Sing-box:
+    name: Cross compile Sing-box
+    runs-on: ubuntu-20.04
+    env:
+      workdir: sing-box-source
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Git clone sing-box
+        run: |
+          [ -e README.md ] && NOW=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
+          LATEST=$(wget -qO- "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | awk -F '"' '/tag_name/{print $4}')
+          if [ "$NOW" != "$LATEST" ]; then
+            echo "VERSION=$LATEST" >> $GITHUB_ENV
+          fi
+          git clone https://github.com/SagerNet/sing-box.git ${{ env.workdir }}
+          cp .github/sing-box.yml ${{ env.workdir }}/.goreleaser.yml
+          sed -i "s/ChangeSingBoxVersion/$LATEST/g" ${{ env.workdir }}/.goreleaser.yml
+
+      - name: Set up GoReleaser
+        if: ${{ env.VERSION != '' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Run GoReleaser
+        if: ${{ env.VERSION != '' }}
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          workdir: ${{ env.workdir }}
+          args: --auto-snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release binaries
+        if: ${{ env.VERSION != '' }}
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          tag_name: ${{ env.VERSION }}
+          prerelease: true
+          files: ${{ env.workdir }}/dist/*.tar.gz
