@@ -23,7 +23,7 @@ jobs:
 
       - name: Git clone sing-box
         run: |
-          apt-get install -y jq
+          sudo apt-get install -y jq
           [ -e README.md ] && OLD=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
           NEW=$(echo $dev_next_tag_data | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
           if [ "$OLD" != "$NEW" ]; then
