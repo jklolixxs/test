@@ -32,9 +32,9 @@ jobs:
           if [ "$OLD" != "$NEW" ]; then
             sed -i "/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$NEW/" README.md
             echo "VERSION=$NEW" >> $GITHUB_ENV
-            export RUN_NEXT_STEPS=true
+            "RUN_NEXT_STEPS=true" >> $GITHUB_ENV
           else
-            export RUN_NEXT_STEPS=false
+            "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
           fi
 
       - name: Set up QEMU
