@@ -48,8 +48,8 @@ jobs:
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
           echo " OLD: $OLD"
           echo " NEW: $NEW"
+          echo "VERSION=$NEW" >> $GITHUB_ENV
           if [ "$OLD" != "$NEW" ]; then
-            echo "VERSION=$NEW" >> $GITHUB_ENV
             echo "RUN_NEXT_STEPS=true" >> $GITHUB_ENV
           else
             echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
