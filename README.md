@@ -2,8 +2,8 @@
 - **使用GitHub Actions自动更新**
 
 ## 当前镜像版本：
- - ### **latest**: 
- - ### **dev-next**: 
+ - ### **latest**: v1.7.0
+ - ### **dev-next**: v1.5.1
 
 ## 特别感谢  
   - [fscarmen2](https://github.com/fscarmen2/docker_builder)
