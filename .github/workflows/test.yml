@@ -48,7 +48,7 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           goversion: ${{ ENV.GOVERSION }}
-          project_path: "go/${{ env.BINARY }}"
+          project_path: "./cmd/sing-box"
           ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'
           md5sum: "false"
           release_tag: "${{ env.BINARY }}"
