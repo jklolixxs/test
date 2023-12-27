@@ -53,7 +53,7 @@ jobs:
           build_flags: "-tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_gvisor"  # 传递给 go build 命令的其他参数
           ldflags: "-s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'"  # ldflags参数
           md5sum: "false"
-          release_tag: "v1.0.0"  # 上传的标签
+          release_tag: "v1.7.6"  # 上传的标签
           release_name: "test"  # 上传的名字
           compress_assets: "auto"  # 自定义打包
           asset_name: "${{ env.BINARY }}-${{ matrix.goos }}-${{ matrix.goarch }}"  # 自定义名称
