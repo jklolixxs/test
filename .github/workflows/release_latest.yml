@@ -28,14 +28,14 @@ jobs:
     steps:
       - name: Checkout My Repositories
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0
+
       - name: Git clone sing-box
         run: |
-          pwd
-          ls -al
           GOVERSION=$(curl -s https://go.dev/VERSION?m=text | grep -oP 'go\K\d+(\.\d+)+')
           echo "GOVERSION=$GOVERSION" >> $GITHUB_ENV
-          OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' test/README.md)
+          [ -e README.md ] && OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' README.md)
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
           echo " OLD: $OLD"
           echo " NEW: $NEW"
