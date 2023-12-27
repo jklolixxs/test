@@ -66,6 +66,7 @@ jobs:
           else
             echo "RUN_RELEASE=false" >> $GITHUB_ENV
           fi
+          echo "RUN_RELEASE: $RUN_RELEASE"
 
       - name: Release binaries
         if: env.RUN_NEXT_STEPS && env.RUN_RELEASE == true
