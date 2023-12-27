@@ -59,7 +59,7 @@ jobs:
 
       - name: Check if tag exists
         run: |
-          TAG_NAME='$NEW'
+          TAG_NAME=${{ env.VERSION }}
           TAG_EXISTS=$(curl -s \
                        "https://api.github.com/repos/jklolixxs/test/releases/tags/$TAG_NAME" \
                        | jq -r '.id // empty')
@@ -70,7 +70,7 @@ jobs:
           fi
 
       - name: Release binaries
-        if: env.RUN_NEXT_STEPS && env.RUN_RELEASE == 'true'
+        if: env.RUN_NEXT_STEPS || env.RUN_RELEASE == 'true'
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
