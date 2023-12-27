@@ -41,6 +41,8 @@ jobs:
             echo "VERSION=$NEW" >> $GITHUB_ENV
           fi
 
+      - name: Checkout My Repositories
+        uses: actions/checkout@v4
       - name: Release binaries
         if: ${{ env.VERSION != '' }}
         uses: softprops/action-gh-release@v0.1.15
