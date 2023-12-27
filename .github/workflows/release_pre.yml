@@ -39,9 +39,9 @@ jobs:
           echo " NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
             echo "VERSION=$NEW" >> $GITHUB_ENV
-            export RUN_NEXT_STEPS=true
+            echo "::set-env name=RUN_NEXT_STEPS::true"
           else
-            export RUN_NEXT_STEPS=false
+            echo "::set-env name=RUN_NEXT_STEPS::false"
           fi
 
       - name: Checkout My Repositories
