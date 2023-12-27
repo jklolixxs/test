@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: 0 */1 * * *
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   releases-matrix:
     name: Release Go Binary
@@ -22,20 +26,18 @@ jobs:
             goos: darwin
           - goarch: "arm"
             goos: darwin
-          - goarch: "arm64"
-            goos: darwin
+          # - goarch: "arm64"
+          #   goos: darwin
           - goarch: "386"
             goos: windows
           - goarch: arm
             goos: windows
-          - goarch: arm64
-            goos: windows
+          # - goarch: arm64
+          #   goos: windows
 
     steps:
       - name: Checkout My Repositories
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Git clone sing-box
         run: |
@@ -43,40 +45,39 @@ jobs:
           echo "GOVERSION=$GOVERSION" >> $GITHUB_ENV
           [ -e README.md ] && OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' README.md)
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
-          echo " OLD: $OLD"
-          echo " NEW: $NEW"
           echo "VERSION=$NEW" >> $GITHUB_ENV
           if [ "$OLD" != "$NEW" ]; then
             echo "RUN_NEXT_STEPS=true" >> $GITHUB_ENV
           else
             echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
           fi
-
-      - name: Checkout My Repositories
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if tag exists
-        run: |
-          TAG_NAME=${{ env.VERSION }}
-          TAG_EXISTS=$(curl -s https://api.github.com/repos/jklolixxs/test/releases/tags/$TAG_NAME | jq -r '.tag_name')
-          echo "TAG_EXISTS: $TAG_EXISTS"
-          if [ $TAG_EXISTS == null ]; then
+          TAG_EXISTS=$(curl -s https://api.github.com/repos/jklolixxs/test/releases/tags/$NEW | jq -r '.tag_name')
+          if [ $TAG_EXISTS != $NEW ]; then
             echo "RUN_RELEASE=true" >> $GITHUB_ENV
           else
             echo "RUN_RELEASE=false" >> $GITHUB_ENV
           fi
 
+      # - name: Check if tag exists
+      #   run: |
+      #     TAG_NAME=${{ env.VERSION }}
+      #     TAG_EXISTS=$(curl -s https://api.github.com/repos/jklolixxs/test/releases/tags/$TAG_NAME | jq -r '.tag_name')
+      #     echo "TAG_EXISTS: $TAG_EXISTS"
+      #     if [ $TAG_EXISTS == null ]; then
+      #       echo "RUN_RELEASE=true" >> $GITHUB_ENV
+      #     else
+      #       echo "RUN_RELEASE=false" >> $GITHUB_ENV
+      #     fi
+
       - name: Release binaries
-        if: ${{ env.RUN_NEXT_STEPS == true && env.RUN_RELEASE == true }}
+        if: ${{ env.RUN_NEXT_STEPS == 'true' && env.RUN_RELEASE == 'true' }}
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
           prerelease: false
 
       - name: Git clone repository
-        if: ${{ env.RUN_NEXT_STEPS == true }}
+        if: ${{ env.RUN_NEXT_STEPS == 'true' }}
         uses: actions/checkout@v4
         with:
           repository: "SagerNet/sing-box"
@@ -84,7 +85,7 @@ jobs:
           fetch-depth: 1
 
       - uses: wangyoucao577/go-release-action@v1.41
-        if: ${{ env.RUN_NEXT_STEPS == true }}
+        if: ${{ env.RUN_NEXT_STEPS == 'true' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # 你的 GITHUB_TOKEN 用于将版本上传到 Github Release。
           goos: ${{ matrix.goos }} # 运行程序的操作系统
@@ -102,7 +103,7 @@ jobs:
           asset_name: "${{ env.BINARY }}-${{ matrix.goos }}-${{ matrix.goarch }}" # 自定义名称
 
       - name: Delete old workflow runs
-        if: ${{ env.RUN_NEXT_STEPS == true }}
+        if: ${{ env.RUN_NEXT_STEPS == 'true' }}
         uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
