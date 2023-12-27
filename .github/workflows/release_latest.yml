@@ -61,6 +61,7 @@ jobs:
         run: |
           TAG_NAME=${{ env.VERSION }}
           TAG_EXISTS=$(curl -s https://api.github.com/repos/jklolixxs/test/releases/tags/$TAG_NAME | jq -r '.tag_name')
+          echo "TAG_EXISTS: $TAG_EXISTS"
           if [ $TAG_EXISTS == null ]; then
             echo "RUN_RELEASE=true" >> $GITHUB_ENV
           else
