@@ -26,6 +26,9 @@ jobs:
             goos: darwin
 
     steps:
+      - name: Checkout My Repositories
+        uses: actions/checkout@v4
+        
       - name: Git clone sing-box
         run: |
           pwd
@@ -43,9 +46,6 @@ jobs:
             echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
           fi
 
-      - name: Checkout My Repositories
-        if: env.RUN_NEXT_STEPS
-        uses: actions/checkout@v4
       - name: Release binaries
         if: env.RUN_NEXT_STEPS
         uses: softprops/action-gh-release@v0.1.15
