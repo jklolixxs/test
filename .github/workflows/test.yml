@@ -50,7 +50,7 @@ jobs:
           goversion: ${{ env.GOVERSION }}  # Go 编译环境版本
           project_path: "./cmd/sing-box"  # 在哪里运行 go build 命令。
           binary_name: "${{ env.BINARY }}"  # 二进制名称
-          build_flags: "-o ${{ env.BINARY }}/dist -tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_gvisor"  # 传递给 go build 命令的其他参数
+          build_flags: "-tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_gvisor"  # 传递给 go build 命令的其他参数
           ldflags: "-s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'"  # ldflags参数
           md5sum: "false"
           release_tag: "v1.7.6"  # 上传的标签
