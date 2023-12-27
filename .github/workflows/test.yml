@@ -31,7 +31,9 @@ jobs:
       - name: Git clone sing-box
         run: |
           VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
+          GOVERSION=$(curl -s https://go.dev/VERSION?m=text | grep -oP 'go\K\d+(\.\d+)+')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "GOVERSION=$GOVERSION" >> $GITHUB_ENV
 
       - name: Git clone repository
         uses: actions/checkout@v4
@@ -47,7 +49,7 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: "latest"
           project_path: "go/${{ env.BINARY }}"
-          ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'
+          ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.GOVERSION }}'
           md5sum: "false"
           release_tag: "${{ env.BINARY }}"
           release_name: "${{ env.BINARY }}"
