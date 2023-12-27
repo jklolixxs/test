@@ -17,19 +17,11 @@ ARG TARGETARCH
 ENV DOWNLOAD_URL "https://github.com/jklolixxs/test/releases/download/${SB_VERSION}/sing-box-${TARGETOS}-${TARGETARCH}"
 
 # 下载并解压 sing-box
-RUN if [ "$TARGETOS" = "windows" ]; then \
-      wget -O /tmp/sing-box.zip $DOWNLOAD_URL.zip \
-      && unzip /tmp/sing-box.zip -d /tmp/ \
-      && mv /tmp/sing-box /usr/local/bin/sing-box \
-      && chmod +x /usr/local/bin/sing-box \
-      && rm /tmp/sing-box.zip; \
-    else \
-      wget -O /tmp/sing-box.tar.gz $DOWNLOAD_URL.tar.gz \
-      && tar -xzvf /tmp/sing-box.tar.gz -C /tmp/ \
-      && mv /tmp/sing-box /usr/local/bin/sing-box \
-      && chmod +x /usr/local/bin/sing-box \
-      && rm /tmp/sing-box.tar.gz; \
-    fi
+RUN wget -O /tmp/sing-box.tar.gz $DOWNLOAD_URL \
+  && tar -xzvf /tmp/sing-box.tar.gz -C /tmp/ \
+  && mv /tmp/sing-box /usr/local/bin/sing-box \
+  && chmod +x /usr/local/bin/sing-box \
+  && rm /tmp/sing-box.tar.gz
 
 FROM --platform=$TARGETPLATFORM alpine AS dist
 RUN set -ex \
