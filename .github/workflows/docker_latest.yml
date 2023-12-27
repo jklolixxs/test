@@ -1,9 +1,9 @@
-name: "4. Build Pre Images && Pull"
+name: "2. Build Latest Images && Pull"
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["3. Build Pre Release && Pull"]
+    workflows: ["1. Build Latest Release && Pull"]
     branches: [main]
     types:
       - completed
@@ -25,13 +25,12 @@ jobs:
 
       - name: Check the latest verion
         run: |
-          [ -e $GITHUB_WORKSPACE/README.md ] && OLD=$(awk '/^\s+- ### \*\*dev-next\*\*:/ {print $NF}' $GITHUB_WORKSPACE/README.md)
-          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
-          echo "OLD: $OLD"
-          echo "NEW: $NEW"
+          OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' $GITHUB_WORKSPACE/README.md)
+          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
+          echo " OLD: $OLD"
+          echo " NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
-            sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$NEW/" $GITHUB_WORKSPACE/README.md
-            echo "VERSION=$NEW" >> $GITHUB_ENV
+            sed -i "/^ - ### \*\*latest\*\*:/s/\(.*: \).*/\1$NEW/" README.md
             echo "RUN_NEXT_STEPS=true" >> $GITHUB_ENV
           else
             echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
