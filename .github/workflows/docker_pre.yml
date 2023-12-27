@@ -26,9 +26,9 @@ jobs:
       - name: Check the latest verion
         run: |
           [ -e README.md ] && OLD=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
-          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
-          echo " OLD: $OLD"
-          echo " NEW: $NEW"
+          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
+          echo "OLD: $OLD"
+          echo "NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
             sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$NEW/" README.md
             echo "VERSION=$NEW" >> $GITHUB_ENV
