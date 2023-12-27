@@ -51,11 +51,10 @@ jobs:
           else
             echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
           fi
-          TAG_EXISTS=$(curl -s https://api.github.com/repos/jklolixxs/test/releases/tags/$NEW | jq -r '.tag_name // empty')
-          if [ -z "$TAG_EXISTS" ]; then
-            echo "RUN_RELEASE=true" >> $GITHUB_ENV
-          else
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
             echo "RUN_RELEASE=false" >> $GITHUB_ENV
+          else
+            echo "RUN_RELEASE=true" >> $GITHUB_ENV
           fi
 
       # - name: Check if tag exists
