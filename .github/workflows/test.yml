@@ -47,9 +47,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          goversion: "latest"
+          goversion: ${{ ENV.GOVERSION }}
           project_path: "go/${{ env.BINARY }}"
-          ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.GOVERSION }}'
+          ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'
           md5sum: "false"
           release_tag: "${{ env.BINARY }}"
           release_name: "${{ env.BINARY }}"
