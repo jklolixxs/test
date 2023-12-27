@@ -62,7 +62,7 @@ jobs:
 
       - name: Check if tag exists
         run: |
-          TAG_NAME=${{ env.VERSION }}
+          TAG_NAME=$NEW
           TAG_EXISTS=$(curl -s \
                        "https://api.github.com/repos/jklolixxs/test/releases/tags/$TAG_NAME" \
                        | jq -r '.id // empty')
