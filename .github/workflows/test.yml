@@ -1,0 +1,65 @@
+name: test
+
+on:
+  # push:
+  #   tags:
+  #     - 'grpcwebproxy*'
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - main
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: 0
+      BINARY: sing-box
+
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64, arm, arm64, mips, mipsle, s390x, riscv64]
+        goamd64: [v1]
+        exclude:
+          - goarch: arm
+            goos: windows
+          - goarch: arm64
+            goos: windows
+
+    steps:
+      - name: Git clone sing-box
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Git clone repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'SagerNet/sing-box'
+          ref: 'main-next'
+          fetch-depth: 1
+
+      - uses: wangyoucao577/go-release-action@v1.41
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "latest"
+          project_path: "go/${{ env.BINARY }}"
+          ldflags: -s -w --extldflags '-static -fpic' -X 'github.com/sagernet/sing-box/constant.Version=${{ ENV.VERSION }}'
+          md5sum: "false"
+          release_tag: "${{ env.BINARY }}"
+          release_name: "${{ env.BINARY }}"
+          binary_name: "${{ env.BINARY }}"
+          compress_assets: "AUTO"
+          asset_name: "${{ env.BINARY }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+
+      - name: Delete old workflow runs
+        uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          repository: ${{ github.repository }}
+          older-than-seconds: 3600
