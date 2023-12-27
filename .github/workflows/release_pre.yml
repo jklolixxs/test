@@ -31,27 +31,30 @@ jobs:
     steps:
       - name: Git clone sing-box
         run: |
-          [ -e README.md ] && OLD=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
-          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
           GOVERSION=$(curl -s https://go.dev/VERSION?m=text | grep -oP 'go\K\d+(\.\d+)+')
           echo "GOVERSION=$GOVERSION" >> $GITHUB_ENV
+          [ -e README.md ] && OLD=$(awk '/^ - ### \*\*dev-next\*\*:/{print $NF}' README.md)
+          NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
           echo " OLD: $OLD"
           echo " NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
             echo "VERSION=$NEW" >> $GITHUB_ENV
+            export RUN_NEXT_STEPS=true
+          else
+            export RUN_NEXT_STEPS=false
           fi
 
       - name: Checkout My Repositories
         uses: actions/checkout@v4
       - name: Release binaries
-        if: ${{ env.VERSION != '' }}
+        if: env.RUN_NEXT_STEPS
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
           prerelease: true
 
       - name: Git clone repository
-        if: ${{ env.VERSION != '' }}
+        if: env.RUN_NEXT_STEPS
         uses: actions/checkout@v4
         with:
           repository: "SagerNet/sing-box"
@@ -59,7 +62,7 @@ jobs:
           fetch-depth: 1
 
       - uses: wangyoucao577/go-release-action@v1.41
-        if: ${{ env.VERSION != '' }}
+        if: env.RUN_NEXT_STEPS
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # 你的 GITHUB_TOKEN 用于将版本上传到 Github Release。
           goos: ${{ matrix.goos }} # 运行程序的操作系统
@@ -77,7 +80,7 @@ jobs:
           asset_name: "${{ env.BINARY }}-${{ env.VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}" # 自定义名称
 
       - name: Delete old workflow runs
-        if: ${{ env.VERSION != '' }}
+        if: env.RUN_NEXT_STEPS
         uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
