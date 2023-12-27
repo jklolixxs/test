@@ -57,6 +57,10 @@ jobs:
             echo "RUN_RELEASE=true" >> $GITHUB_ENV
           fi
 
+      - name: test123456
+        run: |
+          echo ${{ env.RUN_RELEASE }}
+
       # - name: Check if tag exists
       #   run: |
       #     TAG_NAME=${{ env.VERSION }}
