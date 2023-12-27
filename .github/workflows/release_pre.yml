@@ -19,14 +19,16 @@ jobs:
     strategy:
       matrix:
         goos: [linux, windows, darwin]
-        goarch: [amd64, arm, arm64]
+        goarch: ["386", amd64, arm, arm64]
         exclude:
-          - goarch: "arm"
+          - goarch: "386"
             goos: darwin
           - goarch: "arm"
+            goos: darwin
+          - goarch: arm
             goos: windows
-          - goarch: "arm64"
-            goos: darwin
+          - goarch: arm64
+            goos: windows
 
     steps:
       - name: Checkout My Repositories
@@ -92,7 +94,7 @@ jobs:
           release_name: "${{ env.VERSION }}" # 上传的名字
           compress_assets: "auto" # 自定义打包
           overwrite: true # 覆盖
-          asset_name: "${{ env.BINARY }}-${{ env.VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}" # 自定义名称
+          asset_name: "${{ env.BINARY }}-${{ matrix.goos }}-${{ matrix.goarch }}" # 自定义名称
 
       - name: Delete old workflow runs
         if: env.RUN_NEXT_STEPS
