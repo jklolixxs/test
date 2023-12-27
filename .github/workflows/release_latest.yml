@@ -2,8 +2,8 @@ name: "1. Build Latest Release && Pull"
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 0 */1 * * *
+  # schedule:
+  #   - cron: 0 */1 * * *
 
 permissions:
   contents: write
