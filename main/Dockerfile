@@ -1,27 +1,19 @@
-FROM --platform=$TARGETPLATFORM alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder
+WORKDIR /go/src/github.com/sagernet/sing-box
+ARG TARGETOS TARGETARCH
+ENV CGO_ENABLED=0
+ENV GOOS=$TARGETOS
+ENV GOARCH=$TARGETARCH
 
 RUN set -ex \
-  && apk upgrade \
-  && apk add curl wget jq bash tzdata ca-certificates \
-  && rm -rf /var/cache/apk/*
-
-# 设置 sing-box 版本
-SB_VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
-ENV SB_VERSION="$SB_VERSION"
-
-# 获取当前系统和架构
-ARG TARGETOS
-ARG TARGETARCH
-
-# 构建下载 URL
-ENV DOWNLOAD_URL "https://github.com/jklolixxs/test/releases/download/${SB_VERSION}/sing-box-${TARGETOS}-${TARGETARCH}"
-
-# 下载并解压 sing-box
-RUN wget -O /tmp/sing-box.tar.gz $DOWNLOAD_URL \
-  && tar -xzvf /tmp/sing-box.tar.gz -C /tmp/ \
-  && mv /tmp/sing-box /usr/local/bin/sing-box \
-  && chmod +x /usr/local/bin/sing-box \
-  && rm /tmp/sing-box.tar.gz
+  && apk add git build-base git \
+  && git clone -b v1.7.1 --single-branch https://github.com/sagernet/sing-box /go/src/github.com/sagernet/sing-box \
+  && export COMMIT=$(git rev-parse --short HEAD) \
+  && export VERSION=$(go run ./cmd/internal/read_tag) \
+  && go build -trimpath -tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_v2ray_api,with_gvisor \
+    -o /go/bin/sing-box \
+    -ldflags "-X \"github.com/sagernet/sing-box/constant.Version=$VERSION\" -s -w -buildid=" \
+    ./cmd/sing-box
 
 FROM --platform=$TARGETPLATFORM alpine AS dist
 RUN set -ex \
@@ -29,5 +21,5 @@ RUN set -ex \
   && apk add bash tzdata ca-certificates \
   && rm -rf /var/cache/apk/*
 
-COPY --from=builder /usr/local/bin/sing-box /usr/local/bin/sing-box
+COPY --from=builder /go/bin/sing-box /usr/local/bin/sing-box
 ENTRYPOINT [ "/usr/local/bin/sing-box" ]
