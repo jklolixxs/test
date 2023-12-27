@@ -18,14 +18,14 @@ jobs:
       DOCKERHUB_REPOSITORY: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout My Repositories
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Check the latest verion
         run: |
-          OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' $GITHUB_WORKSPACE/README.md)
+          [ -e README.md ] && OLD=$(awk '/^\s+- ### \*\*latest\*\*:/ {print $NF}' README.md)
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r '.tag_name')
           echo " OLD: $OLD"
           echo " NEW: $NEW"
