@@ -67,17 +67,16 @@ jobs:
           else
             echo "RUN_RELEASE=false" >> $GITHUB_ENV
           fi
-          echo "RUN_RELEASE: $RUN_RELEASE"
 
       - name: Release binaries
-        if: env.RUN_RELEASE
+        if: ${{ env.RUN_NEXT_STEPS }} && ${{ env.RUN_RELEASE }}
         uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ env.VERSION }}
           prerelease: false
 
       - name: Git clone repository
-        if: env.RUN_NEXT_STEPS
+        if: ${{ env.RUN_NEXT_STEPS }}
         uses: actions/checkout@v4
         with:
           repository: "SagerNet/sing-box"
@@ -85,7 +84,7 @@ jobs:
           fetch-depth: 1
 
       - uses: wangyoucao577/go-release-action@v1.41
-        if: env.RUN_NEXT_STEPS
+        if: ${{ env.RUN_NEXT_STEPS }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # 你的 GITHUB_TOKEN 用于将版本上传到 Github Release。
           goos: ${{ matrix.goos }} # 运行程序的操作系统
@@ -103,7 +102,7 @@ jobs:
           asset_name: "${{ env.BINARY }}-${{ matrix.goos }}-${{ matrix.goarch }}" # 自定义名称
 
       - name: Delete old workflow runs
-        if: env.RUN_NEXT_STEPS
+        if: ${{ env.RUN_NEXT_STEPS }}
         uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
