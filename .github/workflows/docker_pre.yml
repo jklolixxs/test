@@ -30,7 +30,7 @@ jobs:
           echo " OLD: $OLD"
           echo " NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
-            sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$LATEST/" README.md
+            sed -i "/^ - ### \*\*dev-next\*\*:/s/\(.*: \).*/\1$NEW/" README.md
             echo "VERSION=$NEW" >> $GITHUB_ENV
           fi
 
