@@ -10,7 +10,7 @@ RUN set -ex \
   && git clone -b v1.8.0-beta.1 --single-branch https://github.com/sagernet/sing-box /go/src/github.com/sagernet/sing-box \
   && export COMMIT=$(git rev-parse --short HEAD) \
   && export VERSION=$(go run ./cmd/internal/read_tag) \
-  && go build -v -trimpath -tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_v2ray_api,with_gvisor \
+  && go build -trimpath -tags with_quic,with_grpc,with_dhcp,with_wireguard,with_ech,with_utls,with_reality_server,with_acme,with_clash_api,with_v2ray_api,with_gvisor \
     -o /go/bin/sing-box \
     -ldflags "-X \"github.com/sagernet/sing-box/constant.Version=$VERSION\" -s -w -buildid=" \
     ./cmd/sing-box
