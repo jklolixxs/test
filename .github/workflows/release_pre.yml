@@ -33,15 +33,15 @@ jobs:
         run: |
           GOVERSION=$(curl -s https://go.dev/VERSION?m=text | grep -oP 'go\K\d+(\.\d+)+')
           echo "GOVERSION=$GOVERSION" >> $GITHUB_ENV
-          [ -e README.md ] && OLD=$(awk '/^\s+- ### \*\*dev-next\*\*:/ {print $NF}' README.md)
+          [ -e $GITHUB_WORKSPACE/README.md ] && OLD=$(awk '/^\s+- ### \*\*dev-next\*\*:/ {print $NF}' $GITHUB_WORKSPACE/README.md)
           NEW=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'map(select(.prerelease == true) | .tag_name) | .[0]')
           echo " OLD: $OLD"
           echo " NEW: $NEW"
           if [ "$OLD" != "$NEW" ]; then
             echo "VERSION=$NEW" >> $GITHUB_ENV
-            echo "::set-env name=RUN_NEXT_STEPS::true"
+            echo "RUN_NEXT_STEPS=true" >> $GITHUB_ENV
           else
-            echo "::set-env name=RUN_NEXT_STEPS::false"
+            echo "RUN_NEXT_STEPS=false" >> $GITHUB_ENV
           fi
 
       - name: Checkout My Repositories
